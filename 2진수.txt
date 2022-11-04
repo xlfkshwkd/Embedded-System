@@ -1,0 +1,82 @@
+#include "mbed.h"
+#define LED_MASK 0x000000f0
+// LED0=PA_4, LED1=PA_5, LED2=PA_6, LED3=PA_7
+#define BLINK_DELAY 500ms
+PortOut leds(PortA, LED_MASK);
+int main() {
+while (1) {
+    int k=16;
+leds = 0; //leds.write(0)
+ThisThread::sleep_for(BLINK_DELAY);
+for(int i= 0; i <=16; i++) {
+    if(i==1)
+    {
+leds = 0b00010000 ; //0x10
+ThisThread::sleep_for(BLINK_DELAY);
+}
+if(i==2)
+    {
+leds = 0b00100000 ; //0x10
+ThisThread::sleep_for(BLINK_DELAY);
+}
+if(i==3)
+    {
+leds = 0b00110000 ; //0x10
+ThisThread::sleep_for(BLINK_DELAY);
+}if(i==4)
+    {
+leds = 0b01000000 ; //0x10
+ThisThread::sleep_for(BLINK_DELAY);
+}if(i==5)
+    {
+leds = 0b01010000 ; //0x10
+ThisThread::sleep_for(BLINK_DELAY);
+}if(i==6)
+    {
+leds = 0b01100000; //0x10
+ThisThread::sleep_for(BLINK_DELAY);
+}if(i==7)
+    {
+leds = 0b01110000; //0x10
+ThisThread::sleep_for(BLINK_DELAY);
+}if(i==8)
+    {
+leds = 0b10000000 ; //0x10
+ThisThread::sleep_for(BLINK_DELAY);
+}if(i==9)
+    {
+leds = 0b10010000 ; //0x10
+ThisThread::sleep_for(BLINK_DELAY);
+}if(i==10)
+    {
+leds = 0b10100000 ; //0x10
+ThisThread::sleep_for(BLINK_DELAY);
+}if(i==11)
+    {
+leds = 0b10110000 ; //0x10
+ThisThread::sleep_for(BLINK_DELAY);
+}if(i==12)
+    {
+leds = 0b11000000 ; //0x10
+ThisThread::sleep_for(BLINK_DELAY);
+}if(i==13)
+    {
+leds = 0b11010000 ; //0x10
+ThisThread::sleep_for(BLINK_DELAY);
+}
+if(i==14)
+    {
+leds = 0b11100000 ; //0x10
+ThisThread::sleep_for(BLINK_DELAY);
+}
+if(i==15)
+    {
+leds = 0b11110000 ; //0x10
+ThisThread::sleep_for(BLINK_DELAY);
+}
+    
+}
+
+    
+}
+}

@@ -1,0 +1,24 @@
+#include "mbed.h"
+InterruptIn button(BUTTON1);
+DigitalOut led1(LED1);
+
+#define SAMPLING_DELAY 1000ms
+AnalogIn LM35(PA_0);
+
+void toggle() {
+ while (1){    
+float temp = 0.0;
+
+temp=LM35.read()*4095*0.08;
+printf("Temperature= %f\n", temp);
+ThisThread::sleep_for(10ms);
+}
+
+}
+int main(){
+button.rise(&toggle); 
+while (1){ 
+ThisThread::sleep_for(1s);
+led1 = !led1;
+}
+}

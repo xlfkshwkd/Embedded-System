@@ -1,0 +1,173 @@
+#include "mbed.h"
+InterruptIn button(BUTTON1);
+InterruptIn button2(PC_0);
+InterruptIn button3(PC_1);
+
+DigitalOut led1(LED1);
+#include "Adafruit_SSD1306.h"
+Timer tmr;
+
+#define DS3231_ADDR (0x68)
+#define REG_SEC (0x00)
+#define REG_MIN (0x01)
+#define REG_HOUR (0x02)
+#define REG_WEEK (0x03)
+#define REG_DAY (0x04)
+#define REG_MONTH (0x05)
+#define REG_YEAR (0x06)
+
+void write_data(uint8_t addr, uint8_t reg, uint8_t data);
+uint8_t read_data(uint8_t addr, uint8_t reg);
+uint8_t bcd_to_decimal(uint8_t bcd);
+uint8_t decimal_to_bcd(uint8_t decimal);
+I2C i2c(I2C_SDA, I2C_SCL);
+
+Adafruit_SSD1306_I2c oled(i2c,NC,0x78,64,128); 
+
+void oled_write_string(char *str);
+
+
+
+char week[8][4] = {"nul", "Sun", "Mon", "Tue",
+                   "Wed", "Thu", "Fri", "Sat"
+                  };
+unsigned char times[7];
+uint8_t addr = DS3231_ADDR << 1;
+
+volatile uint16_t  temperature = 0;
+
+uint8_t flag=0, D=0 ,s=0;
+
+void gettemp()
+{
+      flag=!flag;
+   
+}
+void timer()
+{
+      D=!D;
+   
+}
+void stop()
+{
+      s=!s;
+}
+
+//register order {sec, min, hour, week, day, month, year}
+
+int main()
+{
+      char buf[256];
+      char buf2[256]; 
+      char buf3[256]; 
+        button.rise(&gettemp);   
+        button2.rise(&timer);   
+        i2c.frequency(400000);
+        oled.begin();
+        oled.clearDisplay();  
+ 
+    
+    
+ 
+    while(1) {
+        ThisThread::sleep_for(1000ms);
+        times[0] = bcd_to_decimal(read_data(addr, REG_SEC));
+        times[1] = bcd_to_decimal(read_data(addr, REG_MIN));
+        times[2] = bcd_to_decimal(read_data(addr, REG_HOUR));
+        times[3] = bcd_to_decimal(read_data(addr, REG_WEEK));
+       times[4] = bcd_to_decimal(read_data(addr, REG_YEAR));
+       times[5] = bcd_to_decimal(read_data(addr, REG_MONTH));
+       times[6] = bcd_to_decimal(read_data(addr, REG_DAY));
+       
+
+    uint8_t temp_MSB;
+    uint8_t temp_LSB;
+    temp_MSB = read_data(addr, 0x11);
+    temp_LSB = read_data(addr, 0x12);
+    temperature= temp_MSB << 8;
+    temperature |= temp_LSB;
+
+    
+    oled.setTextSize(1); 
+    oled.setTextCursor(10,10);
+    sprintf(buf2,"20%02d year\n %02d mouth \n %02d day \n %02d:%02d:%02d %s\n", times[4],times[5],times[6],times[2], times[1],
+         times[0], week[times[3]]);
+    oled_write_string(buf2);  
+    oled.display(); 
+    
+     if(flag==1)
+    {   
+        temperature=temperature/265;
+      sprintf(buf,"Temp : %u .C",temperature);     
+         oled.setTextSize(1); 
+         oled.setTextCursor(10,45);
+        oled_write_string(buf);
+        oled.display();   
+        
+    }
+    else if(flag==0)
+    {
+        oled.clearDisplay();  
+    }
+   
+    if(D == 1)
+    {   int i=0,j=0;
+        oled.clearDisplay(); 
+        while(1)
+        {      
+        sprintf(buf3,"Timer \n %02d : %02d ", j , i);     
+         oled.setTextSize(2); 
+         oled.setTextCursor(10,10);
+        oled_write_string(buf3);
+        i=i+1;
+        if(i==60)
+        {
+             j=j+1; 
+             i=0;   
+        }
+        oled.display();   
+        ThisThread::sleep_for(1s);
+        }       
+    }
+    else if (D==0)
+    {
+         oled.clearDisplay();
+    }
+    
+    
+    
+    }
+}
+void write_data(uint8_t addr, uint8_t reg, uint8_t data)
+{
+    char byte[2];
+    byte[0]=reg;
+    byte[1]=data;
+    i2c.write(addr, byte, 2, 0);
+}
+uint8_t read_data(uint8_t addr, uint8_t reg)
+{
+    char data[1];
+    char byte[1];
+    byte[0]=reg;
+    i2c.write(addr, byte, 1, 1);
+    i2c.read(addr, data, 1, 0);
+    return data[0];
+}
+
+uint8_t bcd_to_decimal(uint8_t bcd)
+{
+    return (bcd >> 4) * 10 + (bcd & 0x0F);
+}
+
+uint8_t decimal_to_bcd(uint8_t decimal)
+{
+    return ( ((decimal / 10) << 4) | (decimal % 10) );
+} 
+
+void oled_write_string(char *str){
+for(int i=0; str[i]; i++)
+{
+oled.writeChar(str[i]);
+}
+}

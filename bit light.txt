@@ -1,0 +1,66 @@
+#include "mbed.h"
+#define LED_MASK 0x000000f0
+// LED0=PA_4, LED1=PA_5, LED2=PA_6, LED3=PA_7
+#define POT_DELAY 1000ms
+AnalogIn mypot(PA_0, 3.3);
+PortOut leds(PortA, LED_MASK);
+
+int main()
+{
+    int led_on, pos=0;
+  
+        pos = mypot/0.2; // 5구간으로 분할
+//printf("val= %d\n", pos);
+        led_on = 0x00; // led들의 비트 패턴
+        while(1){
+        for(int i=1; i<= 15 ; i++) { //pos의 값에 따라 LED 비트설정
+            if(i==1) {
+                led_on =0b00010000;
+                ThisThread::sleep_for(POT_DELAY);
+            } else if(i==2) {
+                led_on =0b00100000;
+                ThisThread::sleep_for(POT_DELAY);
+            } else if(i==3) {
+                led_on =0b00110000;
+                ThisThread::sleep_for(POT_DELAY);
+            } else if(i==4) {
+                led_on =0b01000000;
+                ThisThread::sleep_for(POT_DELAY);
+            } else if(i==5) {
+                led_on =0b01010000;
+                ThisThread::sleep_for(POT_DELAY);
+            } else if(i==6) {
+                led_on =0b01100000;
+                ThisThread::sleep_for(POT_DELAY);
+            } else if(i==7) {
+                led_on =0b01110000;
+                ThisThread::sleep_for(POT_DELAY);
+            } else if(i==8) {
+                led_on =0b10000000;
+                ThisThread::sleep_for(POT_DELAY);
+            } else if(i==9) {
+                led_on =0b10010000;
+                ThisThread::sleep_for(POT_DELAY);
+            } else if(i==10) {
+                led_on =0b10100000;
+                ThisThread::sleep_for(POT_DELAY);
+            } else if(i==11) {
+                led_on =0b10110000;
+                ThisThread::sleep_for(POT_DELAY);
+            } else if(i==12) {
+                led_on =0b11000000;
+                ThisThread::sleep_for(POT_DELAY);
+            } else if(i==13) {
+                led_on =0b11010000;
+                ThisThread::sleep_for(POT_DELAY);
+            } else if(i==14) {
+                led_on =0b11100000;
+                ThisThread::sleep_for(POT_DELAY);
+            } else if(i==15) {
+                led_on =0b11110000;
+                ThisThread::sleep_for(POT_DELAY);
+            } 
+            leds = led_on ; // 비트패턴에 따라 LED 켬
+            ThisThread::sleep_for(POT_DELAY);
+        }
+    }}
